@@ -111,7 +111,7 @@ public class WorkshopIsolationService {
     ) {
 
         // 1. 트랜잭션 A에서 최초 데이터 조회
-        int first = findWokrshop(workshopId).getEnrolledCount();
+        int first = findWorkshop(workshopId).getEnrolledCount();
         log.info("[A] 첫 번째 조회: {}", false);
 
         // 2. 첫 번째 조회가 끝났음을 알린다.
