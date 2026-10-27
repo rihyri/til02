@@ -27,7 +27,11 @@ public enum DomainExceptionCode {
     EXCEEDED_MAX_PERCENT(HttpStatus.BAD_REQUEST, "정률 할인(PERCENT)인 경우 할인 값은 100%를 초과할 수 없습니다."),
     MISSING_MAX_DISCOUNT_AMOUNT(HttpStatus.BAD_REQUEST, "정률 할인(PERCENT)인 경우 최대 할인 한도(maxDiscountAmount)를 설정해야 합니다."),
 
+    ALREADY_REGISTERED_COUPON(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
+    UNAVAILABLE_COUPON(HttpStatus.BAD_REQUEST, "사용 기간이 지난 쿠폰입니다."),
+    EXCEED_COUPON_USAGE_LIMIT(HttpStatus.BAD_REQUEST, "쿠폰 발행 한도를 초과했습니다."),
     NOT_FOUND_COUPON_USER(HttpStatus.NOT_FOUND, "쿠폰을 찾을 수 없습니다."),
+    NOT_FOUND_COUPON_CODE(HttpStatus.NOT_FOUND, "우효한 쿠폰 코드가 존재하지 않습니다."),
     INVALID_COUPON_CODE(HttpStatus.UNPROCESSABLE_ENTITY, "해당 쿠폰 코드는 사용할 수 없습니다."),
     ALREADY_USED_COUPON(HttpStatus.UNPROCESSABLE_ENTITY, "이미 사용된 쿠폰 코드 입니다."),
     INACTIVE_COUPON_ID(HttpStatus.UNPROCESSABLE_ENTITY, "해당 쿠폰는 비활성화 되있습니다."),
