@@ -9,6 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 ext {
 	set('springAiVersion', '1.1.8')
+	set('springCloudVersion', '2024.0.1')
 }
 
 java {
@@ -35,6 +36,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -44,13 +46,17 @@ dependencies {
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
-	runtimeOnly 'com.mysql:mysql-connector-j'
-
 	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
 
-	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('test') {
