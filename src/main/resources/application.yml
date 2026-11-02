@@ -52,3 +52,4 @@ logging:
 external:
   external-shop:
     url: http://localhost:3001
+    ## sync-cron: "0 0 * * * *"
