@@ -1,6 +1,6 @@
 <br>
 
-# Week 09 - Day 03. 분산 데이터와 Kafka 이벤트 설게
+# Week 09 - Day 03. 분산 데이터와 Kafka 이벤트 설계
 
 <br>
 
