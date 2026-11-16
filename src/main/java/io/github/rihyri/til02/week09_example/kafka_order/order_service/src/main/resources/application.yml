@@ -1,0 +1,43 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: order-service
+
+  # 메모리 DB(H2). 서비스를 끄면 데이터도 사라진다.
+  datasource:
+    url: jdbc:h2:mem:orderdb
+    username: sa
+    password:
+  jpa:
+    hibernate:
+        ddl-auto: create-drop   # 엔티티를 보고 테이블을 자동 생성
+  h2:
+    console:
+      enabled: true     # http://localhost:8081/h2-console에서 DB 조회 가능
+
+  # ⭐ Kafka 설정
+  kafka:
+    bootstrap-servers: localhost:9092   # Kafka 브로커 주소 (docker-compose의 9092)
+    producer:
+      # 메시지를 "문자열(JSON)"으로 보낸다. 객체 → JSON 변환은 코드에서 직접 한다.
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      # 컨슈머 그룹 이름. 같은 그룹 안에서는 메시지 하나를 한 명만 처리한다.
+      group-id: order-service
+      # 이 그룹이 처음 접속했을 때 "토픽의 맨 처음부터 읽기"
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  # ⭐ 모니터링: /actuator/prometheus 주소를 열어 Prometheus가 지표를 가져가게 함
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health, metrics, prometheus
+    metrics:
+      tags:
+        application: ${spring.application.name}   # 모든 지표에 application="order-service" 꼬리표

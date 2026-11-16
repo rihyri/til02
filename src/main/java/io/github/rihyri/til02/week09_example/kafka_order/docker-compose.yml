@@ -1,0 +1,67 @@
+# 인프라(Kafka, Kafka UI, Prometheus, Grafana)를 한 번에 띄우는 파일이다.
+# 주문/결제 서비스는 여기 없고, 내 PC에서 gradlew로 직접 실행한다.
+# 실행: docker compose up -d
+# 종료: docker compose down
+services:
+
+  # Kafka: 서비스끼리 주고 받은 메시지를 보관하는 "우체국"
+  # ZooKeeper 없이 KRaft 모드로 브로커 1대만 띄운다.
+  kafka:
+    image: apache/kafka:3.9.1
+    container_name: kafka
+    ports:
+      - "9092:9092"   # 내 PC(스프링 서비스)가 접속하는 포트
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker, controller   # 혼자서 브로커 + 컨트롤러 역할
+      # 접속 창구(리스너) 3개
+      # - PLAINTEXT      : 도커 내부용 (Kafka UI가 kafka:29092로 접속)
+      # - PLAINTEXT_HOST : 내 PC용 (스프링이 localhost:9092로 접속)
+      # - CONTROLLER     : Kafka 내부 관리용
+      KAFKA_LISTENERS: PLAINTEXT://29092,PLAINTEXT_HOST://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAIN_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # 브로커가 1대뿐이라 복제본 수를 1로 맞춤
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  # Kafka UI: 토픽과 메시지를 웹 화면으로 보는 도구 (http://localhost:8080)
+  kafka-ui:
+    image: kafbat/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTER_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+
+  # Prometheus: 서비스의 지표(숫자)를 주깆거으로 "가져와서" 저장 (http://localhost:9090)
+  prometheus:
+    image: prom/prometheus/latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      # 컨테이너 안에서 내 PC(호스트)를 host.docker.internal 이름으로 부르기 위함
+      - "host.docker.internal:host-gateway"
+
+  # Grafana: Prometheus에 저장된 지표를 그래프로 보여줌 (http://localhost:3000, admin / admin)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      # Prometheus 데이터 소스를 미리 등록해 두는 설정
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus

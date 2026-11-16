@@ -1,0 +1,39 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: payment-service
+
+    # 결제 서비스는 자기만의 DB를 따로 가진다. (MSA: 서비스마다 DB 분리)
+    datasource:
+      url: jdbc:h2:mem:paymentdb
+      username: sa
+      password:
+    jpa:
+      hibernate:
+        ddl-auto: create-drop
+    h2:
+      console:
+        enabled: true         # http://localhost:8082/h2-console
+
+    kafka:
+      bootstrap-servers: localhost:9092
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      consumer:
+        # 주문 서비스와 다른 그룹 이름, 그룹이 다르면 같은 메시지를 따로 받는다.
+        group-id: payment-service
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}

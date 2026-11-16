@@ -1,0 +1,16 @@
+# Prometheus는 "가져가는(pull)" 방식이다.
+# 서비스가 지표를 보내주는 게 아니라, Prometheus가 5초마다 각 서비스의
+# /actuator/prometheus 주소에 접속해서 숫자를 긁어간다.
+global:
+  scrape_intervals: 5s
+
+scrape_configs:
+  - job_name: order-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.interval:8081']    # 내 PC에서 실행 중인 주문 서비스
+  
+  - job_name: payment-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:8082']    # 내 PC에서 실행 중인 결제 서비스

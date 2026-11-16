@@ -1,0 +1,39 @@
+// 두 서비스가 공통으로 쓰는 빌드 설정이다.
+plugins {
+    id 'org.springframework.boot' version '3.5.7' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-manament'
+
+    group = 'com.example'
+    version = '0.0.1'
+
+    java {
+        // Java 17 이상이면 실행 가능
+        sourceCompatibility = JavaVersion.VERSION_17
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // REST API (Controller)
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        // DB 저장 (JPA + 메모리 DB H2: 설치 없이 바로 실행됨)
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'com.h2database:h2'
+        // ⭐ Kafka: KafkaTemplate(보내기), @KafkaListener(받기)를 제공
+        implementation 'org.springframework.kafka:spring-kafka'
+        // ⭐ 모니터링: /actuator/prometheus 주소로 지표를 노출
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+    }
+}
