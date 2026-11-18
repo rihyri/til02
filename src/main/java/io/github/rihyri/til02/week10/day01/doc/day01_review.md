@@ -1,6 +1,6 @@
 <br>
 
-# Week 09 - Day 01. 회고
+# Week 10 - Day 01. 회고
 
 <br>
 
