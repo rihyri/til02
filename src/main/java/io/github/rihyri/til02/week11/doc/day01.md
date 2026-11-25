@@ -306,7 +306,7 @@ kubectl get pods -o wide        # 각 Pod의 IP와 어느 노드(NODE)에서 도
 
 - kube-proxy는 규칙을 커널에 **미리 깔아 두는** 역할이라, kube-proxy가 잠깐 멈춰도 이미 깔린 규칙으로 통신은 계속된다. (Pod 목록이 바뀐 것은 반영되지 않는다.)
 - Docker로 빌드한 이미지는 OCI 표준 이미지라서 containerd 같은 런타임에도 그대로 실행된다.
-- 
+
 ```bash
 kubectl get pods -n kube-system     # apiserver, etcd, scheduler, kube-proxy 등은 보이지만 kubelet 은 없다
 ```
